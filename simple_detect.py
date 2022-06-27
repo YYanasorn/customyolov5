@@ -48,7 +48,7 @@ for path, im, im0s, vid_cap, s in dataset:
   pred = model(im)
   pred = non_max_suppression(pred, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
   dt[2] += time_sync() - t3
-  print(pred)
+  
 
   # Process predictions
   for i, det in enumerate(pred):  # per image
