@@ -1,3 +1,5 @@
+from turtle import circle
+import numpy as np
 import torch
 from pathlib import Path
 from models.common import DetectMultiBackend
@@ -18,6 +20,7 @@ agnostic_nms = False
 max_det = 1000
 webcam = True 
 line_thickness = 3
+
 
 save_dir = increment_path(Path("runs/detect") / "exp", exist_ok=False)
 model = DetectMultiBackend(weights)
@@ -75,6 +78,17 @@ for path, im, im0s, vid_cap, s in dataset:
               c = int(cls)  # integer class
               label = f'{names[c]} {conf:.2f}'
               annotator.box_label(xyxy, label, color=colors(c, True))
+              c1, c2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))  
+              center_point = round((c1[0]+c2[0])/2), round((c1[1]+c2[1])/2)
+              circle = cv2.circle(im0, center_point, 2, (60,179,113), 2)
+              text_coord = cv2.putText(im0, str(center_point), center_point, cv2.FONT_HERSHEY_PLAIN, 3, (0,255,0))
+
+      # Print results
+          for c in det[:, -1].unique():
+              n = (det[:, -1] == c).sum()  # detections per class
+              s += f"{n} {names[int(c)]}{center_point}{'s' * (n > 1)}, "  # add to string
+
+
     im0 = annotator.result()
     if view_img:
         if p not in windows:
@@ -83,3 +97,8 @@ for path, im, im0s, vid_cap, s in dataset:
             cv2.resizeWindow(str(p), im0.shape[1], im0.shape[0])
         cv2.imshow(str(p), im0)
         cv2.waitKey(1)  # 1 millisecond
+  
+
+  print(pred)
+  
+       
