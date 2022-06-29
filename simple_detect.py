@@ -1,3 +1,4 @@
+from re import X
 from turtle import circle
 import numpy as np
 import torch
@@ -20,7 +21,11 @@ agnostic_nms = False
 max_det = 1000
 webcam = True 
 line_thickness = 3
-
+camera_width = 640
+camera_height = 480
+center_camera_x = camera_width/2
+center_camera_y = camera_height/2
+center_camera = round(center_camera_x),round(center_camera_y)
 
 save_dir = increment_path(Path("runs/detect") / "exp", exist_ok=False)
 model = DetectMultiBackend(weights)
@@ -35,6 +40,7 @@ vid_path, vid_writer = [None] * bs, [None] * bs
 #dataset = LoadImages(source, img_size=imgsz, stride=stride, auto=pt)
 model.warmup(imgsz=(1 if pt else bs, 3, *imgsz))
 seen, windows, dt = 0, [], [0.0, 0.0, 0.0]
+
 
 for path, im, im0s, vid_cap, s in dataset:
   t1 = time_sync()
@@ -80,14 +86,18 @@ for path, im, im0s, vid_cap, s in dataset:
               annotator.box_label(xyxy, label, color=colors(c, True))
               c1, c2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))  
               center_point = round((c1[0]+c2[0])/2), round((c1[1]+c2[1])/2)
-              circle = cv2.circle(im0, center_point, 2, (60,179,113), 2)
+              circle = cv2.circle(im0, center_point, 1, (60,179,113), 2)
               text_coord = cv2.putText(im0, str(center_point), center_point, cv2.FONT_HERSHEY_PLAIN, 3, (0,255,0))
+              dx = center_point[0] - 320
+              dy = 240 - center_point[1]
+              print(dx)
+              print(dy)       
+             
 
       # Print results
           for c in det[:, -1].unique():
               n = (det[:, -1] == c).sum()  # detections per class
               s += f"{n} {names[int(c)]}{center_point}{'s' * (n > 1)}, "  # add to string
-
 
     im0 = annotator.result()
     if view_img:
@@ -95,10 +105,11 @@ for path, im, im0s, vid_cap, s in dataset:
             windows.append(p)
             cv2.namedWindow(str(p), cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)  # allow window resize (Linux)
             cv2.resizeWindow(str(p), im0.shape[1], im0.shape[0])
+        circle = cv2.circle(im0, center_camera, 1, (0,255,0), 2)
         cv2.imshow(str(p), im0)
         cv2.waitKey(1)  # 1 millisecond
-  
 
   print(pred)
+
   
        
