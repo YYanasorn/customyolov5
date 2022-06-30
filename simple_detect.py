@@ -90,7 +90,7 @@ for path, im, im0s, vid_cap, s in dataset:
               text_coord = cv2.putText(im0, str(center_point), center_point, cv2.FONT_HERSHEY_PLAIN, 3, (0,255,0))
               dx = center_point[0] - 320
               dy = 240 - center_point[1]
-              Line = cv2.line(im0, center_camera, center_point, (0,255,0, 8))
+              Line = cv2.line(im0, center_camera, center_point, (0,255,0, 10))
               print(dx)
               print(dy)       
              
@@ -112,5 +112,5 @@ for path, im, im0s, vid_cap, s in dataset:
 
   print(pred)
 
-  
+
        
