@@ -9,6 +9,8 @@ from utils.dataloaders import LoadImages, LoadStreams
 from utils.torch_utils import time_sync
 from utils.plots import Annotator, colors
 import torch.backends.cudnn as cudnn
+import serial
+import time
 
 weights = "Best.pt"
 source = "0"
@@ -40,7 +42,7 @@ vid_path, vid_writer = [None] * bs, [None] * bs
 #dataset = LoadImages(source, img_size=imgsz, stride=stride, auto=pt)
 model.warmup(imgsz=(1 if pt else bs, 3, *imgsz))
 seen, windows, dt = 0, [], [0.0, 0.0, 0.0]
-
+ser = serial.Serial("COM3", 9600)
 
 for path, im, im0s, vid_cap, s in dataset:
   t1 = time_sync()
@@ -93,7 +95,13 @@ for path, im, im0s, vid_cap, s in dataset:
               Line = cv2.line(im0, center_camera, center_point, (0,255,0, 10))
               print(dx)
               print(dy)       
-             
+              sending_dx = str(dx)
+              sending_dy = str(dy)
+              ser.write(sending_dx.encode())
+              print("Sending dx :" + sending_dx)
+              ser.write(sending_dy.encode())
+              print("Sending dy :" + sending_dy)
+
 
       # Print results
           for c in det[:, -1].unique():
@@ -110,7 +118,4 @@ for path, im, im0s, vid_cap, s in dataset:
         cv2.imshow(str(p), im0)
         cv2.waitKey(1)  # 1 millisecond
 
-  print(pred)
 
-
-       
