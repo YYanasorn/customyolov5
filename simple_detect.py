@@ -11,6 +11,7 @@ from utils.plots import Annotator, colors
 import torch.backends.cudnn as cudnn
 import serial
 import time
+import math
 
 weights = "Best.pt"
 source = "0"
@@ -43,6 +44,14 @@ vid_path, vid_writer = [None] * bs, [None] * bs
 model.warmup(imgsz=(1 if pt else bs, 3, *imgsz))
 seen, windows, dt = 0, [], [0.0, 0.0, 0.0]
 ser = serial.Serial("COM3", 9600)
+
+def toBinary(a):
+  l,m=[],[]
+  for i in a:
+    l.append(ord(i))
+  for i in l:
+    m.append(int(bin(i)[2:]))
+  return m
 
 for path, im, im0s, vid_cap, s in dataset:
   t1 = time_sync()
@@ -92,15 +101,15 @@ for path, im, im0s, vid_cap, s in dataset:
               text_coord = cv2.putText(im0, str(center_point), center_point, cv2.FONT_HERSHEY_PLAIN, 3, (0,255,0))
               dx = center_point[0] - 320
               dy = 240 - center_point[1]
-              Line = cv2.line(im0, center_camera, center_point, (0,255,0, 10))
-              print(dx)
-              print(dy)       
-              sending_dx = str(dx)
-              sending_dy = str(dy)
-              ser.write(sending_dx.encode())
-              print("Sending dx :" + sending_dx)
-              ser.write(sending_dy.encode())
-              print("Sending dy :" + sending_dy)
+              Line = cv2.line(im0, center_camera, center_point, (0,255,0, 10))     
+              str_x = str(dx)
+              str_y = str(dy)
+              Binary_x = format(dx, "b")
+              Binary_y = format(dy, "b")
+              ser.write(Binary_x.encode())
+              print("Send x :" + Binary_x + "," + str_x)
+              ser.write(Binary_y.encode())
+              print("Send y :" + Binary_y + "," + str_y)
 
 
       # Print results
@@ -117,5 +126,3 @@ for path, im, im0s, vid_cap, s in dataset:
         circle = cv2.circle(im0, center_camera, 1, (0,255,0), 2)
         cv2.imshow(str(p), im0)
         cv2.waitKey(1)  # 1 millisecond
-
-
