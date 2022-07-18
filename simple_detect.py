@@ -110,6 +110,7 @@ for path, im, im0s, vid_cap, s in dataset:
               print("Send x :" + Binary_x + "," + str_x)
               ser.write(Binary_y.encode())
               print("Send y :" + Binary_y + "," + str_y)
+              
 
 
       # Print results
